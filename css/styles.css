@@ -210,7 +210,9 @@ input[type=search]::-webkit-search-cancel-button, input[type=search]::-webkit-se
 .list-head.no-results { border-bottom: 1px solid var(--border); }
 .list-head .cb:disabled { cursor: default; } /* disabled look comes from the Check-Box-Disable icon */
 .list-head.bordered { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.cb { width: 16px; height: 16px; flex: none; display: grid; place-items: center; }
+.cb { position: relative; width: 16px; height: 16px; flex: none; display: grid; place-items: center; }
+/* Invisible 44×44 tap area around the 16px box, so a near-miss selects instead of opening the document. */
+.cb::before { content: ''; position: absolute; inset: -14px; }
 
 .list { padding: 0 24px; }
 .list.pad-bottom { padding-bottom: 24px; }
