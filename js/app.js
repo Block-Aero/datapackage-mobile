@@ -108,7 +108,7 @@
   }
 
   function stickyShadow(scroller, sticky) {
-    const update = () => sticky.classList.toggle('stuck', sticky.getBoundingClientRect().top <= scroller.getBoundingClientRect().top + 0.5 && scroller.scrollTop > 0);
+    const update = () => sticky.classList.toggle('stuck', sticky.getBoundingClientRect().top <= scroller.getBoundingClientRect().top + (parseFloat(getComputedStyle(sticky).top) || 0) + 0.5 && scroller.scrollTop > 0);
     scroller.addEventListener('scroll', update, { passive: true });
     update();
   }
@@ -230,7 +230,7 @@
     function renderTop() {
       topEl.innerHTML = `
         <button class="pkg-title" data-act="toggle-desc" aria-expanded="${s.expanded}">${esc(PACKAGE.name)} ${ic(s.expanded ? 'arrowUp' : 'chevronDown')}</button>
-        ${s.expanded ? `<p class="pkg-desc">Created On: ${esc(PACKAGE.createdOn)}<br>Valid Until: ${esc(PACKAGE.validUntil)}</p>` : ''}`;
+        ${s.expanded ? `<p class="pkg-desc"><span>Created On: ${esc(PACKAGE.createdOn)}</span><span>Valid Until: ${esc(PACKAGE.validUntil)}</span></p>` : ''}`;
     }
 
     function renderSticky() {

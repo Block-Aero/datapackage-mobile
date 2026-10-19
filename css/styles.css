@@ -179,12 +179,12 @@ html.bare .screen { border-radius: 0; }
 /* ---------- Data package ---------- */
 .pkg-top { padding: 24px 24px 0; } /* 24px below the header */
 .pkg-title { display: flex; align-items: center; gap: 8px; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-primary); text-align: left; }
-.pkg-desc { margin-top: 12px; font-size: 12px; line-height: 16px; color: var(--text-primary); }
+.pkg-desc { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; line-height: 16px; color: var(--text-primary); }
 .sticky {
-  position: sticky; top: 0; z-index: 3; background: var(--bg-primary);
-  padding: 24px 24px 0; margin-top: -4px; /* 20px under the title; 24px under the header when stuck */
+  position: sticky; top: 4px; z-index: 3; background: var(--bg-primary);
+  padding: 20px 24px 0; /* 20px under the title; when stuck it pins 4px down → tabs 24px under the header */
 }
-.sticky.stuck { box-shadow: 0 6px 6px -6px rgba(0, 0, 0, .12); }
+.sticky.stuck { box-shadow: 0 -4px 0 var(--bg-primary), 0 6px 6px -6px rgba(0, 0, 0, .12); } /* fills the 4px strip above when stuck */
 
 .tabs { position: relative; display: flex; height: 32px; border-bottom: 1px solid var(--border); }
 .tab {
@@ -279,7 +279,7 @@ input[type=search]::-webkit-search-cancel-button, input[type=search]::-webkit-se
 .illus .floor { position: absolute; left: 3.45%; right: 0; top: 98.27%; bottom: .8%; background: var(--border); }
 
 /* ---------- Asset profile ---------- */
-.asset-tabs-wrap.sticky { margin-top: 0; padding-top: 24px; }
+.asset-tabs-wrap.sticky { top: 0; margin-top: 0; padding-top: 24px; }
 .content { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
 .card { background: var(--bg-secondary); border: 1px solid var(--border); }
 .card-head { height: 44px; display: flex; align-items: center; padding: 0 16px 0 20px; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
