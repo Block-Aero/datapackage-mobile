@@ -43,25 +43,33 @@
   const stack = [];
   const top = () => stack[stack.length - 1];
   function mount(view) { app.insertBefore(view.el, app.querySelector('.statusbar')); }
+  // Views marked `instant` (the document viewer) appear/disappear in place – no slide, no shift of the screen behind.
+  const withoutTransition = (el, fn) => { el.style.transition = 'none'; fn(); el.getBoundingClientRect(); el.style.transition = ''; };
   function push(view, animate = true) {
     const prev = top();
     stack.push(view);
     mount(view);
-    if (prev && animate) {
+    if (prev && animate && !view.instant) {
       view.el.classList.add('enter');
       view.el.getBoundingClientRect();
       view.el.classList.remove('enter');
       prev.el.classList.add('behind');
-    } else if (prev) prev.el.classList.add('behind');
+    } else if (prev) withoutTransition(prev.el, () => prev.el.classList.add('behind'));
     history.pushState({ depth: stack.length }, '');
     view.onShow && view.onShow();
   }
   function pop() {
     if (stack.length < 2) return;
     const v = stack.pop();
-    top().el.classList.remove('behind');
-    v.el.classList.add('leave');
-    setTimeout(() => v.el.remove(), 330);
+    const prev = top();
+    if (v.instant) {
+      withoutTransition(prev.el, () => prev.el.classList.remove('behind'));
+      v.el.remove();
+    } else {
+      prev.el.classList.remove('behind');
+      v.el.classList.add('leave');
+      setTimeout(() => v.el.remove(), 330);
+    }
     v.onDestroy && v.onDestroy();
     syncNav();
   }
@@ -861,7 +869,7 @@
     // Double-tap / double-click to zoom the page.
     stage.addEventListener('dblclick', () => { s.zoom = s.zoom === 1 ? 2 : 1; paint(); });
     paint();
-    return { el, type: 'viewer' };
+    return { el, type: 'viewer', instant: true }; // opens in place, no slide
   }
 
   /* =========================================================
