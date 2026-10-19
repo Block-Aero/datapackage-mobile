@@ -33,6 +33,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 input { font: inherit; color: inherit; border: 0; outline: 0; background: transparent; }
 img { display: block; }
 [hidden] { display: none !important; }
+/* Focus outline in Block.Aero blue instead of each browser's default blue (keyboard / accessibility focus). */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input:focus-visible { outline: none; } /* fields show focus with their own blue border */
 .mi { display: inline-block; flex: none; background: currentColor; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 
 /* ---------- Stage: collapsible screen list on the left + phone centred in the rest (desktop) ---------- */
