@@ -828,7 +828,7 @@
       prev.innerHTML = ic('arrowLeft', 20); prev.disabled = s.page === 1;
       next.innerHTML = ic('arrowRight', 20); next.disabled = s.page === doc.pages;
       page.style.transform = `rotate(${s.rot}deg)`;
-      page.style.width = 337 * s.zoom + 'px'; page.style.height = 258 * s.zoom + 'px';
+      page.style.width = s.zoom === 1 ? '' : `${100 * s.zoom}%`; // fills the width (24px margins); double-tap zooms in
       el.querySelector('.thumbs').classList.toggle('open', s.sidebar);
       el.querySelector('.thumbs-scrim').classList.toggle('open', s.sidebar);
       const sideBtn = el.querySelector('[data-act=sidebar].tb');

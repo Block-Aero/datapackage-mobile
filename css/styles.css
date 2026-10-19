@@ -395,8 +395,8 @@ table.dt td.link { color: var(--accent); }
 .toolbar .right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
 .stage-doc { position: relative; flex: 1; min-height: 0; overflow: auto; scrollbar-width: none; touch-action: pan-x pan-y; }
 .stage-doc::-webkit-scrollbar { display: none; }
-.doc-canvas { min-height: 100%; display: grid; place-items: center; padding: 24px 28px 96px; }
-.doc-page { width: 337px; height: 258px; background: #fff; transition: transform .3s ease; box-shadow: 0 2px 12px rgba(0, 0, 0, .3); }
+.doc-canvas { min-height: 100%; display: grid; place-items: center; padding: 24px 24px 96px; } /* 24px side margins like every other screen */
+.doc-page { width: 100%; aspect-ratio: 337 / 258; background: #fff; transition: transform .3s ease; box-shadow: 0 2px 12px rgba(0, 0, 0, .3); }
 .doc-page img { width: 100%; height: 100%; object-fit: cover; }
 .more-btn { position: absolute; right: 24px; top: 19px; z-index: 2; width: 16px; height: 16px; }
 /* Page control: Figma style (square, #50565b) with thumb-sized 44px targets, clear page count, dimmed ends. Swiping the page also turns it. */
