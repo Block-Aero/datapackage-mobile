@@ -10,22 +10,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   <!-- Prototype: load CSS/JS with a fresh query string so phones never show a cached version. -->
   <script>window.__v = Date.now(); document.write('<link rel="stylesheet" href="css/styles.css?v=' + window.__v + '">');</script>
-  <script>if (/[?&]bare/.test(location.search)) document.documentElement.classList.add('bare');</script>
+  <script>
+    if (/[?&]bare/.test(location.search)) document.documentElement.classList.add('bare');
+    // ?mobile – the flow only: no screen list, starts at the login (full screen on a phone, centred phone on desktop)
+    if (/[?&]mobile/.test(location.search)) document.documentElement.classList.add('app-only');
+  </script>
 </head>
 <body>
-  <div class="stage">
-    <aside class="navigator" aria-label="Prototype navigator">
-      <div class="nav-head">
+  <div class="stage" id="stage">
+    <aside class="navigator" id="navigator" aria-label="Prototype navigator">
+      <div class="nav-top">
         <img src="assets/img/logo.svg" width="120" height="24" alt="Block.Aero" />
-        <h1>Data Package · Receiver View</h1>
-        <p>Mobile prototype. Tap through the phone, or jump to any Figma screen below.</p>
-        <p class="nav-hint">Password: <code>blockaero</code> · anything else shows the error state.</p>
+        <button class="nav-btn" id="nav-close" type="button" aria-label="Hide screen list" aria-controls="navigator" aria-expanded="true"><img src="assets/icons/sidebar.svg" width="20" height="20" alt="" /></button>
       </div>
-      <nav id="nav-list"></nav>
+      <div class="nav-body">
+        <div class="nav-head">
+          <h1>Data Package · Receiver View</h1>
+          <p>Mobile prototype. Tap through the phone, or jump to any Figma screen below.</p>
+          <p class="nav-hint">Password: <code>blockaero</code> · anything else shows the error state.</p>
+        </div>
+        <nav id="nav-list"></nav>
+      </div>
     </aside>
-    <div class="device">
-      <div class="screen" id="app"></div>
-    </div>
+    <button class="nav-btn nav-open" id="nav-open" type="button" aria-label="Show screen list" aria-controls="navigator"><img src="assets/icons/sidebar.svg" width="20" height="20" alt="" /></button>
+    <main class="canvas">
+      <div class="device">
+        <div class="screen" id="app"></div>
+      </div>
+    </main>
   </div>
   <script>document.write('<script src="js/data.js?v=' + window.__v + '"><\/script><script src="js/app.js?v=' + window.__v + '"><\/script>');</script>
 </body>

@@ -939,16 +939,34 @@
     navList.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.screen === id));
   }
 
-  /* Scale the device frame down on short desktop windows so the whole phone stays visible. */
+  /* Screen list: collapses to the left; the choice is remembered in this browser. */
+  const stageEl = document.getElementById('stage');
+  const navClose = document.getElementById('nav-close');
+  const navOpen = document.getElementById('nav-open');
+  function setNav(open, remember = true) {
+    stageEl.classList.toggle('nav-closed', !open);
+    navClose.setAttribute('aria-expanded', String(open));
+    navOpen.setAttribute('aria-expanded', String(open));
+    if (remember) { try { localStorage.setItem('dp-nav-closed', open ? '0' : '1'); } catch (e) { /* storage unavailable */ } }
+    fitDevice();
+  }
+  navClose.addEventListener('click', () => setNav(false));
+  navOpen.addEventListener('click', () => setNav(true));
+  document.getElementById('navigator').addEventListener('transitionend', fitDevice);
+
+  /* Centre the phone in the space next to the list and scale it down if that space is too small. */
   function fitDevice() {
     const d = document.querySelector('.device');
+    const canvas = document.querySelector('.canvas');
     const desktop = isDesktopFrame() && !document.documentElement.classList.contains('bare');
-    const k = desktop ? Math.min(1, (window.innerHeight - 48) / 864) : 1;
+    const k = desktop ? Math.min(1, (canvas.clientHeight - 48) / 864, (canvas.clientWidth - 48) / 413) : 1;
     d.style.transform = k < 1 ? `scale(${k})` : '';
     d.style.margin = k < 1 ? `${(-844 * (1 - k)) / 2}px ${(-393 * (1 - k)) / 2}px` : '';
   }
   window.addEventListener('resize', fitDevice);
-  fitDevice();
+  let startClosed = false;
+  try { startClosed = localStorage.getItem('dp-nav-closed') === '1'; } catch (e) { /* storage unavailable */ }
+  setNav(!startClosed, false);
 
   /* ---------- boot ---------- */
   const start = new URLSearchParams(location.search).get('screen');

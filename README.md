@@ -3,7 +3,9 @@
 Clickable prototype of the Figma page **01 Design ⭐️ → View Data Package Details (Receiver View)**
 (file `LN5JvYg8GMRjHFJVOfxUpJ`). Plain HTML/CSS/JS, no build step.
 
-**Live:** https://cflribeiro.github.io/datapackage-mobile/ (open it on a phone for the full-screen version)
+**Live:** https://cflribeiro.github.io/datapackage-mobile/ (desktop: screen list + phone frame)
+
+**Mobile / share link:** https://cflribeiro.github.io/datapackage-mobile/?mobile (just the flow, no screen list)
 
 ## Run
 
