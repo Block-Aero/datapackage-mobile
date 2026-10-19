@@ -9,6 +9,8 @@
   /* ---------- helpers ---------- */
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ic = (name, w = 16, h = w, cls = '') => `<img src="assets/icons/${name}.svg" width="${w}" height="${h}" alt=""${cls ? ` class="${cls}"` : ''}>`;
+  // Line icon (Google Material Symbols, outlined) drawn in the element's text colour.
+  const lineIc = (name, size = 16) => `<span class="mi" aria-hidden="true" style="width:${size}px;height:${size}px;-webkit-mask-image:url(assets/icons/${name}.svg);mask-image:url(assets/icons/${name}.svg)"></span>`;
   const html = (str) => { const t = document.createElement('template'); t.innerHTML = str.trim(); return t.content.firstElementChild; };
   const assetById = (id) => assets.find((a) => a.id === id);
   const docsForAsset = (id) => docs.filter((d) => d.assetId === id);
@@ -355,7 +357,7 @@
       const n = s.selected.size;
       footer.hidden = !(s.tab === 'documents' && state.docsShared && n > 0);
       footer.innerHTML = `<span class="txt">${n} Document${n === 1 ? '' : 's'}</span>
-        <button class="btn-primary" data-act="download">${ic('download')}Download</button>`;
+        <button class="btn-primary" data-act="download">${lineIc('downloadMaterial')}Download</button>`;
     }
     function renderAll() { renderTop(); renderSticky(); renderList(); }
 
@@ -597,7 +599,7 @@
     function renderFooter() {
       const show = s.tab === 'documents' && !ni && s.selected.size > 0;
       footer.hidden = !show;
-      if (show) footer.innerHTML = `<span class="txt">${s.selected.size} Document${s.selected.size === 1 ? '' : 's'}</span><button class="btn-primary" data-act="download">${ic('download')}Download</button>`;
+      if (show) footer.innerHTML = `<span class="txt">${s.selected.size} Document${s.selected.size === 1 ? '' : 's'}</span><button class="btn-primary" data-act="download">${lineIc('downloadMaterial')}Download</button>`;
     }
 
     function render() {
