@@ -546,7 +546,7 @@
         <label class="search" style="margin-top:0">${ic('search')}<input type="search" value="${esc(s.q)}" placeholder="Search by Serial No. or Part No." aria-label="Search documents" enterkeyhint="search"><button class="clear" type="button" data-act="clear-search"${s.q ? '' : ' hidden'}>${ic('close')}</button></label>
         <div class="list-head${noResults ? ' no-results' : ''}"><button class="cb" data-act="select-all" role="checkbox" aria-checked="${selectAllAria(s.selected.size, assetDocs.length)}" aria-label="Select all"${noResults ? ' disabled aria-disabled="true"' : ''}>${noResults ? ic('checkboxDisabled') : selectAllIcon(s.selected.size, assetDocs.length)}</button><span class="label">Document List</span><span class="count">${s.applied ? (list.length ? `${list.length} result${list.length === 1 ? '' : 's'} for “${esc(s.applied)}”` : '') : `${assetDocs.length} Documents`}</span></div>
         </div>
-        <div class="rows">${s.loading ? Array.from({ length: 3 }, () => '<div class="row skel shimmer"><i></i><i></i></div>').join('') : list.map((d) => `
+        <div class="rows"${noResults ? ' hidden' : ''}>${s.loading ? Array.from({ length: 3 }, () => '<div class="row skel shimmer"><i></i><i></i></div>').join('') : list.map((d) => `
           <div class="row doc-row in-asset" role="button" tabindex="0" data-act="open-doc" data-id="${d.id}">
             <button class="cb" data-act="select" data-id="${d.id}" aria-label="Select document">${ic(s.selected.has(d.id) ? 'checkbox' : 'checkboxBlank')}</button>
             <span class="t">${docTitle(d)}</span>
