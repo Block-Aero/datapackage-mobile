@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Data Package – Receiver View</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Prototype: load CSS/JS with a fresh query string so phones never show a cached version. -->
+  <script>window.__v = Date.now(); document.write('<link rel="stylesheet" href="css/styles.css?v=' + window.__v + '">');</script>
+  <script>if (/[?&]bare/.test(location.search)) document.documentElement.classList.add('bare');</script>
+</head>
+<body>
+  <div class="stage">
+    <aside class="navigator" aria-label="Prototype navigator">
+      <div class="nav-head">
+        <img src="assets/img/logo.svg" width="120" height="24" alt="Block.Aero" />
+        <h1>Data Package · Receiver View</h1>
+        <p>Mobile prototype. Tap through the phone, or jump to any Figma screen below.</p>
+        <p class="nav-hint">Password: <code>blockaero</code> · anything else shows the error state.</p>
+      </div>
+      <nav id="nav-list"></nav>
+    </aside>
+    <div class="device">
+      <div class="screen" id="app"></div>
+    </div>
+  </div>
+  <script>document.write('<script src="js/data.js?v=' + window.__v + '"><\/script><script src="js/app.js?v=' + window.__v + '"><\/script>');</script>
+</body>
+</html>
