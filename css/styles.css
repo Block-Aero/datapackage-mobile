@@ -359,6 +359,10 @@ table.dt td.link { color: var(--accent); }
 .toolbar { height: 52px; display: flex; align-items: center; gap: 16px; padding: 0 24px; background: var(--bg-primary); border-bottom: 1px solid var(--border); }
 .toolbar .tb, .toolbar .rot button { width: 24px; height: 24px; display: grid; place-items: center; }
 .toolbar .tb.active { background: rgba(0, 0, 0, .06); outline: 4px solid rgba(0, 0, 0, .06); }
+/* Active toolbar icon turns Block.Aero blue: the same exported SVG is used as a mask and filled with the accent colour. */
+.toolbar .tb .tint { display: none; width: 20px; height: 20px; background: var(--accent); -webkit-mask-size: 20px 20px; mask-size: 20px 20px; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.toolbar .tb.active .tint { display: block; }
+.toolbar .tb.active .tint + img, .toolbar .tb.active img:has(+ .tint) { display: none; }
 .toolbar .vsep { width: 1px; height: 24px; background: var(--border); }
 .toolbar .rot { display: flex; gap: 16px; }
 .toolbar .right { margin-left: auto; display: flex; align-items: center; gap: 16px; }

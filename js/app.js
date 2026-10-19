@@ -774,7 +774,7 @@
       <section class="view dark" data-screen="viewer">
         <div class="viewer-top">
           <div class="toolbar">
-            <button class="tb" data-act="sidebar" aria-label="Pages">${ic('sidebar', 20)}</button>
+            <button class="tb" data-act="sidebar" aria-label="Pages" aria-pressed="false"><span class="tint" style="-webkit-mask-image:url(assets/icons/sidebar.svg);mask-image:url(assets/icons/sidebar.svg)"></span>${ic('sidebar', 20)}</button>
             <span class="vsep"></span>
             <div class="rot">
               <button data-act="rotate" data-d="-90" aria-label="Rotate left">${ic('rotateLeft', 20)}</button>
@@ -829,7 +829,9 @@
       page.style.width = 337 * s.zoom + 'px'; page.style.height = 258 * s.zoom + 'px';
       el.querySelector('.thumbs').classList.toggle('open', s.sidebar);
       el.querySelector('.thumbs-scrim').classList.toggle('open', s.sidebar);
-      el.querySelector('[data-act=sidebar].tb').classList.toggle('active', s.sidebar);
+      const sideBtn = el.querySelector('[data-act=sidebar].tb');
+      sideBtn.classList.toggle('active', s.sidebar);
+      sideBtn.setAttribute('aria-pressed', String(s.sidebar));
       el.querySelector('.details').classList.toggle('open', s.details);
       el.querySelectorAll('.thumbs button').forEach((b) => b.classList.toggle('active', +b.dataset.p === s.page));
     }
