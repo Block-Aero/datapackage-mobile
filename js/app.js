@@ -199,6 +199,7 @@
       applied: { assets: opts.query && !opts.typing ? opts.query : '', documents: '' },
       loading: !!opts.searchLoading,
       selected: new Set(opts.selectAll ? docs.map((d) => d.id) : []),
+      selAssets: new Set(opts.selectAllAssets ? assets.map((a) => a.id) : []), // selecting an asset downloads all its documents
       limit: PAGE,
     };
     const el = html(`
@@ -244,7 +245,7 @@
           ? `<div class="list-head bordered"><span class="label">Document List</span></div>`
           : `<div class="list-head"><button class="cb" data-act="select-all" role="checkbox" aria-checked="${selectAllAria(s.selected.size, docs.length)}" aria-label="Select all">${selectAllIcon(s.selected.size, docs.length)}</button><span class="label">Document List</span><span class="count">${countText(docResults().length, 'Documents', applied)}</span></div>`;
       } else {
-        head = `<div class="list-head"><span class="label">Asset List</span><span class="count">${s.loading ? '' : countText(assetResults().length, 'Assets', applied)}</span></div>`;
+        head = `<div class="list-head">${state.docsShared ? `<button class="cb" data-act="select-all" role="checkbox" aria-checked="${selectAllAria(s.selAssets.size, assets.length)}" aria-label="Select all">${selectAllIcon(s.selAssets.size, assets.length)}</button>` : ''}<span class="label">Asset List</span><span class="count">${s.loading ? '' : countText(assetResults().length, 'Assets', applied)}</span></div>`;
       }
       stickyEl.innerHTML = `
         ${tabsHtml([{ key: 'assets', label: 'Assets (100)', w: 85 }, { key: 'documents', label: 'Documents (1100)', w: 129 }], s.tab)}
@@ -296,12 +297,13 @@
     }
 
     const assetRow = (a) => `
-      <button class="row asset-row" data-act="open-asset" data-id="${a.id}">
+      <div class="row asset-row${state.docsShared ? ' selectable' : ''}" role="button" tabindex="0" data-act="open-asset" data-id="${a.id}">
+        ${state.docsShared ? `<button class="cb" data-act="select" data-id="${a.id}" aria-label="Select asset">${ic(s.selAssets.has(a.id) ? 'checkbox' : 'checkboxBlank')}</button>` : ''}
         <span class="line1">${ic('part20', 20)}<span>${esc(a.title)}</span></span>
         <span class="docs">${ic('file')}${a.docs}</span>
         <span class="desc">${esc(a.description)}</span>
         ${ic('chevronRight', 16, 16, 'chev')}
-      </button>`;
+      </div>`;
     const docRow = (d) => {
       const a = assetById(d.assetId);
       return `
@@ -352,11 +354,16 @@
         s.appending = false;
       }, 450);
     }
-    // The download bar only appears once at least one document is selected.
+    // The current tab's selection; the asset list selects assets, the document list documents.
+    const sel = () => (s.tab === 'documents' ? s.selected : s.selAssets);
+    const selTotal = () => (s.tab === 'documents' ? docs.length : assets.length);
+    // Documents a download would include: the selected documents, or every document of the selected assets.
+    const docCount = () => (s.tab === 'documents' ? s.selected.size : [...s.selAssets].reduce((n, id) => n + assetById(id).docs, 0));
+    // The download bar only appears once at least one document or asset is selected.
     function renderFooter() {
-      const n = s.selected.size;
-      footer.hidden = !(s.tab === 'documents' && state.docsShared && n > 0);
-      footer.innerHTML = `<span class="txt">${n} Document${n === 1 ? '' : 's'}</span>
+      const n = sel().size, d = docCount();
+      footer.hidden = !(state.docsShared && n > 0);
+      footer.innerHTML = `<span class="txt">${s.tab === 'documents' ? '' : `${n} Asset${n === 1 ? '' : 's'} · `}${d} Document${d === 1 ? '' : 's'}</span>
         <button class="btn-primary" data-act="download">${lineIc('downloadMaterial')}Download</button>`;
     }
     function renderAll() { renderTop(); renderSticky(); renderList(); }
@@ -387,25 +394,27 @@
         syncNav(assetById(t.dataset.id).profile === 'full' ? '401' : assetById(t.dataset.id).profile === 'notIncluded' ? '501' : '506');
       } else if (act === 'select') {
         e.stopPropagation();
-        const id = t.dataset.id;
-        s.selected.has(id) ? s.selected.delete(id) : s.selected.add(id);
-        t.innerHTML = ic(s.selected.has(id) ? 'checkbox' : 'checkboxBlank');
+        const id = t.dataset.id, set = sel();
+        set.has(id) ? set.delete(id) : set.add(id);
+        t.innerHTML = ic(set.has(id) ? 'checkbox' : 'checkboxBlank');
         refreshSelectAll(); renderFooter();
       } else if (act === 'select-all') {
-        const all = s.selected.size === docs.length;
-        s.selected = new Set(all ? [] : docs.map((d) => d.id));
-        listEl.querySelectorAll('[data-act=select]').forEach((b) => { b.innerHTML = ic(s.selected.has(b.dataset.id) ? 'checkbox' : 'checkboxBlank'); });
+        const isDocs = s.tab === 'documents';
+        const all = sel().size === selTotal();
+        const next = new Set(all ? [] : (isDocs ? docs : assets).map((x) => x.id));
+        if (isDocs) s.selected = next; else s.selAssets = next;
+        listEl.querySelectorAll('[data-act=select]').forEach((b) => { b.innerHTML = ic(next.has(b.dataset.id) ? 'checkbox' : 'checkboxBlank'); });
         refreshSelectAll(); renderFooter();
-        syncNav(all ? '105' : '106');
+        syncNav(isDocs ? (all ? '105' : '106') : (all ? '104' : '104b'));
       } else if (act === 'open-doc') {
         push(ViewerView(docs.find((d) => d.id === t.dataset.id)));
         syncNav('601');
-      } else if (act === 'download') { download(t, s.selected.size); }
+      } else if (act === 'download') { download(t, docCount()); }
     });
-    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('.doc-row')) e.target.click(); });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('.doc-row, .asset-row')) e.target.click(); });
     function refreshSelectAll() {
       const b = stickyEl.querySelector('[data-act=select-all]');
-      if (b) { b.innerHTML = selectAllIcon(s.selected.size, docs.length); b.setAttribute('aria-checked', selectAllAria(s.selected.size, docs.length)); }
+      if (b) { b.innerHTML = selectAllIcon(sel().size, selTotal()); b.setAttribute('aria-checked', selectAllAria(sel().size, selTotal())); }
     }
 
     renderAll();
@@ -889,6 +898,7 @@
     ]],
     ['Data package', [
       ['104', 'Asset list', () => reset([PackageView()])],
+      ['104b', 'Assets selected', () => reset([PackageView({ selectAllAssets: true })])],
       ['105', 'Document list', () => reset([PackageView({ tab: 'documents' })])],
       ['106', 'Documents selected', () => reset([PackageView({ tab: 'documents', selectAll: true })])],
       ['300', 'Package details collapsed', () => reset([PackageView()])],

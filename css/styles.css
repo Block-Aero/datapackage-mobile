@@ -233,6 +233,10 @@ input[type=search]::-webkit-search-cancel-button, input[type=search]::-webkit-se
 .asset-row .line1 span { font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-primary); white-space: pre; overflow: hidden; text-overflow: ellipsis; }
 .asset-row .docs { position: absolute; right: 48px; /* 16px gap to the arrow (arrow: 16px wide, 16px from the edge) */ top: 12px; display: flex; align-items: center; gap: 4px; font-size: 14px; line-height: 20px; color: var(--text-strong); }
 .asset-row .desc { position: absolute; left: 16px; top: 40px; width: 288px; font-size: 12px; line-height: 16px; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Selectable asset rows: checkbox on the left like the document list, text starts at 48px. */
+.asset-row .cb { position: absolute; left: 16px; top: 26px; }
+.asset-row.selectable .line1 { left: 48px; }
+.asset-row.selectable .desc { left: 48px; width: auto; right: 40px; }
 
 .doc-row .cb { position: absolute; left: 16px; top: 26px; }
 .doc-row .t { position: absolute; left: 48px; right: 40px; top: 12px; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
