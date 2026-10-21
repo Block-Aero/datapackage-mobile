@@ -467,7 +467,7 @@
     const header = `<header class="header asset">
           <button class="back" data-act="back" aria-label="Back">${ic('back24', 24)}</button>
           <div class="title">${ic('part24', 24)}<span>Part - ${esc(asset.serialNo)}</span></div>
-          <button class="icon-btn info" data-act="info" aria-label="Asset information">${ic('infoSmall', 20)}</button>
+          <button class="icon-btn info" data-act="info" aria-label="Asset information">${lineIc('listAlt', 20)}</button>
         </header>`;
     const el = html(`
       <section class="view" data-screen="asset">
@@ -784,7 +784,7 @@
             </div>
             <div class="right">
               <button class="tb" data-act="download" aria-label="Download">${ic('downloadDark', 20)}</button>
-              <button class="tb" data-act="details" aria-label="Document details">${ic('infoSmall', 20)}</button>
+              <button class="tb" data-act="details" aria-label="Document details">${lineIc('listAlt', 20)}</button>
               <span class="vsep"></span>
               <button class="tb" data-act="close" aria-label="Close viewer">${ic('close20', 20)}</button>
             </div>

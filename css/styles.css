@@ -37,6 +37,8 @@ img { display: block; }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 input:focus-visible { outline: none; } /* fields show focus with their own blue border */
+/* Details buttons (asset header, document viewer) use the Material list_alt icon in the regular icon colour. */
+.header .info, .toolbar .tb[data-act=details] { color: var(--text-primary); }
 .mi { display: inline-block; flex: none; background: currentColor; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 
 /* ---------- Stage: collapsible screen list on the left + phone centred in the rest (desktop) ---------- */
