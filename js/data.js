@@ -21,6 +21,7 @@
     sender: 'Thai Airways Technical',
     password: 'blockaero',
     documentsShared: true,
+    maxDownloadGB: 10, // larger selections show "Download Too Large"
   };
 
   const DESCRIPTIONS = [
@@ -231,6 +232,11 @@
   // First asset mirrors the Figma table content.
   assets[0].events = assets[0].events.map((e) => ({ ...e, date: '5 Jan 2025', type: 'Operation', description: 'Repaired', ref: 'DOC-349585612' }));
   assets.forEach((a) => { a.logisticsUpdated = '28 Dec 2022, 11:00 AM'; });
+
+  // File sizes (MB) from their own seed, so adding them leaves every other generated value unchanged.
+  let sizeSeed = 20251001;
+  const sizeRand = () => { sizeSeed = (sizeSeed * 1103515245 + 12345) % 2147483648; return sizeSeed / 2147483648; };
+  docs.forEach((d) => { d.sizeMB = 40 + Math.floor(sizeRand() * 860); });
 
   window.DATA = { PACKAGE, assets, docs, ORGS };
 })();

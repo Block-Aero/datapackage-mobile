@@ -267,7 +267,8 @@ input[type=search]::-webkit-search-cancel-button, input[type=search]::-webkit-se
 }
 .footer:not([hidden]) { animation: footer-in .22s cubic-bezier(.2, .8, .2, 1); }
 @keyframes footer-in { from { transform: translateY(100%); } }
-.footer .txt { font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.footer .txt { display: flex; flex-direction: column; min-width: 0; font-size: 14px; line-height: 20px; color: var(--text-primary); }
+.footer .txt small { font-size: 12px; line-height: 16px; color: var(--text-placeholder); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .footer .btn-primary { height: 40px; }
 
 /* Empty / not-included states */
@@ -359,6 +360,17 @@ table.dt td.link { color: var(--accent); }
   transform: translateX(100%); transition: transform .32s cubic-bezier(.2, .8, .2, 1);
 }
 .overlay.open .sheet { transform: none; }
+/* Limits 102 / 202 – centred dialog over the dimmed screen, square corners like the rest of the UI. */
+.overlay.modal { display: grid; place-items: center; padding: var(--sb) 24px 0; }
+.overlay.modal .dim { transition-duration: .2s; }
+.dialog { position: relative; width: 100%; background: var(--bg-secondary); padding: 24px 24px 32px; opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s; }
+.overlay.open .dialog { opacity: 1; transform: none; }
+.dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.dialog-head h2 { font-size: 24px; line-height: 32px; font-weight: 400; color: var(--text-primary); }
+.dialog-head .icon-btn { width: 20px; height: 20px; margin-top: 6px; position: relative; }
+.dialog-head .icon-btn::before { content: ''; position: absolute; inset: -12px; }
+.dialog p { font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.dialog p + p { margin-top: 16px; }
 .sheet-head { flex: none; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-primary); }
 .sheet-head .icon-btn { width: 20px; height: 20px; }
 .sec { padding: 24px 24px 24px; border-bottom: 1px solid var(--border); }

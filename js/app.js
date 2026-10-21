@@ -14,6 +14,15 @@
   const html = (str) => { const t = document.createElement('template'); t.innerHTML = str.trim(); return t.content.firstElementChild; };
   const assetById = (id) => assets.find((a) => a.id === id);
   const docsForAsset = (id) => docs.filter((d) => d.assetId === id);
+  // Download sizes (Limits 101–202): 47.3 GB, 812 MB …
+  const fmtSize = (mb) => (mb < 1024 ? `${Math.round(mb)} MB` : `${(mb / 1024).toFixed(1).replace(/\.0$/, '')} GB`);
+  const MAX_DOWNLOAD_MB = PACKAGE.maxDownloadGB * 1024;
+  const docById = Object.fromEntries(docs.map((d) => [d.id, d]));
+  const assetSizeMB = Object.fromEntries(assets.map((a) => [a.id, 0]));
+  docs.forEach((d) => { assetSizeMB[d.assetId] += d.sizeMB; });
+  const docsSizeMB = (ids) => [...ids].reduce((n, id) => n + docById[id].sizeMB, 0);
+  // Download bar text: "3 Assets Selected" over "(49 Documents / 47.3 GB)", or "8 Documents Selected" over "(80 GB)".
+  const selectionText = (label, detail) => `<span class="txt"><span>${label}</span><small>(${detail})</small></span>`;
   // Document rows (105 / 403): title is the document type; second line is the linked part.
   const docTitle = (d) => esc(d.type);
   const assetLine = (a, boldDot) => `${esc(a.partNo)} ${boldDot ? '<b>•</b>' : '•'} ${esc(a.serialNo)}`;
@@ -198,8 +207,8 @@
       q: { assets: opts.query || '', documents: '' },
       applied: { assets: opts.query && !opts.typing ? opts.query : '', documents: '' },
       loading: !!opts.searchLoading,
-      selected: new Set(opts.selectAll ? docs.map((d) => d.id) : []),
-      selAssets: new Set(opts.selectAllAssets ? assets.map((a) => a.id) : []), // selecting an asset downloads all its documents
+      selected: new Set(opts.selectAll ? docs.map((d) => d.id) : docs.slice(0, opts.selectDocs || 0).map((d) => d.id)),
+      selAssets: new Set(opts.selectAllAssets ? assets.map((a) => a.id) : assets.slice(0, opts.selectAssets || 0).map((a) => a.id)), // selecting an asset downloads all its documents
       limit: PAGE,
     };
     const el = html(`
@@ -359,11 +368,15 @@
     const selTotal = () => (s.tab === 'documents' ? docs.length : assets.length);
     // Documents a download would include: the selected documents, or every document of the selected assets.
     const docCount = () => (s.tab === 'documents' ? s.selected.size : [...s.selAssets].reduce((n, id) => n + assetById(id).docs, 0));
+    const selSizeMB = () => (s.tab === 'documents' ? docsSizeMB(s.selected) : [...s.selAssets].reduce((n, id) => n + assetSizeMB[id], 0));
     // The download bar only appears once at least one document or asset is selected.
     function renderFooter() {
       const n = sel().size, d = docCount();
       footer.hidden = !(state.docsShared && n > 0);
-      footer.innerHTML = `<span class="txt">${s.tab === 'documents' ? '' : `${n} Asset${n === 1 ? '' : 's'} · `}${d} Document${d === 1 ? '' : 's'}</span>
+      const docsLabel = `${d} Document${d === 1 ? '' : 's'}`;
+      footer.innerHTML = `${s.tab === 'documents'
+        ? selectionText(`${docsLabel} Selected`, fmtSize(selSizeMB()))
+        : selectionText(`${n} Asset${n === 1 ? '' : 's'} Selected`, `${docsLabel} / ${fmtSize(selSizeMB())}`)}
         <button class="btn-primary" data-act="download">${lineIc('downloadMaterial')}Download</button>`;
     }
     function renderAll() { renderTop(); renderSticky(); renderList(); }
@@ -409,7 +422,7 @@
       } else if (act === 'open-doc') {
         push(ViewerView(docs.find((d) => d.id === t.dataset.id)));
         syncNav('601');
-      } else if (act === 'download') { download(t, docCount()); }
+      } else if (act === 'download') { download(t, docCount(), selSizeMB()); }
     });
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('.doc-row, .asset-row')) e.target.click(); });
     function refreshSelectAll() {
@@ -445,8 +458,28 @@
     }
   }
 
-  function download(btn, n) {
+  // Limits 102 / 202 – the selection is over the maximum download size.
+  const sizeOfFirstAssets = (n) => assets.slice(0, n).reduce((t, a) => t + assetSizeMB[a.id], 0);
+  function tooLarge(sizeMB) {
+    const ov = html(`
+      <div class="overlay modal" role="dialog" aria-modal="true" aria-labelledby="too-large-title">
+        <div class="dim" data-act="close-modal"></div>
+        <div class="dialog">
+          <div class="dialog-head"><h2 id="too-large-title">Download Too Large</h2><button class="icon-btn" data-act="close-modal" aria-label="Close">${ic('close20', 20)}</button></div>
+          <p>This download (${fmtSize(sizeMB)}) exceeds the maximum download size of ${PACKAGE.maxDownloadGB} GB.</p>
+          <p>Remove some items from your selection and try again.</p>
+        </div>
+      </div>`);
+    app.insertBefore(ov, app.querySelector('.statusbar'));
+    requestAnimationFrame(() => ov.classList.add('open'));
+    const close = () => { ov.classList.remove('open'); setTimeout(() => ov.remove(), 220); };
+    ov.addEventListener('click', (e) => { if (e.target.closest('[data-act=close-modal]')) close(); });
+    ov.querySelector('.dialog .icon-btn').focus({ preventScroll: true });
+  }
+
+  function download(btn, n, sizeMB) {
     if (btn.classList.contains('loading')) return;
+    if (sizeMB > MAX_DOWNLOAD_MB) { tooLarge(sizeMB); return; }
     const label = btn.innerHTML;
     btn.classList.add('loading');
     btn.style.minWidth = btn.offsetWidth + 'px';
@@ -608,7 +641,8 @@
     function renderFooter() {
       const show = s.tab === 'documents' && !ni && s.selected.size > 0;
       footer.hidden = !show;
-      if (show) footer.innerHTML = `<span class="txt">${s.selected.size} Document${s.selected.size === 1 ? '' : 's'}</span><button class="btn-primary" data-act="download">${lineIc('downloadMaterial')}Download</button>`;
+      const n = s.selected.size;
+      if (show) footer.innerHTML = `${selectionText(`${n} Document${n === 1 ? '' : 's'} Selected`, fmtSize(docsSizeMB(s.selected)))}<button class="btn-primary" data-act="download">${lineIc('downloadMaterial')}Download</button>`;
     }
 
     function render() {
@@ -693,7 +727,7 @@
         s.selected = new Set(s.selected.size === assetDocs.length ? [] : assetDocs.map((d) => d.id));
         render();
       } else if (act === 'open-doc') { push(ViewerView(docs.find((d) => d.id === t.dataset.id))); syncNav('601'); }
-      else if (act === 'download') download(t, s.selected.size);
+      else if (act === 'download') download(t, s.selected.size, docsSizeMB(s.selected));
     });
 
     render();
@@ -901,6 +935,12 @@
       ['104b', 'Assets selected', () => reset([PackageView({ selectAllAssets: true })])],
       ['105', 'Document list', () => reset([PackageView({ tab: 'documents' })])],
       ['106', 'Documents selected', () => reset([PackageView({ tab: 'documents', selectAll: true })])],
+    ]],
+    ['Download limits', [
+      ['L101', 'Assets selected (size)', () => reset([PackageView({ selectAssets: 3 })])],
+      ['L102', 'Download too large (assets)', () => { reset([PackageView({ selectAssets: 3 })]); tooLarge(sizeOfFirstAssets(3)); }],
+      ['L201', 'Documents selected (size)', () => reset([PackageView({ tab: 'documents', selectDocs: 8 })])],
+      ['L202', 'Download too large (documents)', () => { reset([PackageView({ tab: 'documents', selectAll: true })]); tooLarge(docsSizeMB(docs.map((d) => d.id))); }],
       ['300', 'Package details collapsed', () => reset([PackageView()])],
       ['301', 'Package details expanded', () => reset([PackageView({ expanded: true })])],
     ]],
