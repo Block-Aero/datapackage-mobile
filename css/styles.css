@@ -268,7 +268,7 @@ input[type=search]::-webkit-search-cancel-button, input[type=search]::-webkit-se
 .footer:not([hidden]) { animation: footer-in .22s cubic-bezier(.2, .8, .2, 1); }
 @keyframes footer-in { from { transform: translateY(100%); } }
 .footer .txt { display: flex; flex-direction: column; min-width: 0; font-size: 14px; line-height: 20px; color: var(--text-primary); }
-.footer .txt small { font-size: 12px; line-height: 16px; color: var(--text-placeholder); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.footer .txt small { font-size: 14px; line-height: 20px; color: var(--text-placeholder); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .footer .btn-primary { height: 40px; }
 
 /* Empty / not-included states */
